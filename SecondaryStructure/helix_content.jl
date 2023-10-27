@@ -38,7 +38,7 @@ function get_helicity(dir,nresidues)
   helix_i   = [ mean(matrix[i,10:19]) for i in 1:nfiles ]
   helix_ii  = [ mean(matrix[i,25:37]) for i in 1:nfiles ]
   helix_iii = [ mean(matrix[i,42:56]) for i in 1:nfiles ]
-  helix_tot = [ mean(matrix[i,1:nresidues]) for i in 1:nfiles ]
+  helix_tot = [ (helix_i[i].+helix_ii[i].+helix_iii[i])/3 for i in 1:length(helix_i) ]
   return avg_helicity_per_frame, matrix, helix_i, helix_ii, helix_iii, helix_tot
 end
 
