@@ -42,7 +42,7 @@ Scripts required to reproduce Figure 7 of the manuscript
 Directory: ProbabilityDensity
 
 ### Hydration structures
-Scripts required to reproduce Figure 8 of the manuscript
+Scripts required to run atomistic simulations and reproduce Figure 8 of the manuscript
 
 Directory: HydrationStructures
 
