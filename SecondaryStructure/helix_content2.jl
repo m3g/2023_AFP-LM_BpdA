@@ -28,7 +28,7 @@ function get_helipticity(; dir="./equilibrated_all_atom_models", nfiles=5000)
             nothing
         end
         if isnothing(file_read)
-            println("error in file: $file")
+            println("\n error in file: $file")
             continue
         end
         atoms = readPDB(tmp_pdb)
