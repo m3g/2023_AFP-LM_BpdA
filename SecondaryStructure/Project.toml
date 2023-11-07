@@ -1,0 +1,7 @@
+[deps]
+EasyFit = "fde71243-0cda-4261-b7c7-4845bd106b21"
+PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+ProteinSecondaryStructures = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
+ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
