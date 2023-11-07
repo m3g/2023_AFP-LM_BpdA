@@ -2,7 +2,7 @@ using DelimitedFiles
 
 work = @__DIR__
 
-   helix_i = readdlm("./../../SecondaryStructure/helix_tot.txt")
+   helix = readdlm("./../../SecondaryStructure/helix_tot.txt")
 
 function cluster_q(helix) 
   h_25 = Vector{Int64}(undef,0)
@@ -41,7 +41,7 @@ function cluster_q(helix)
   return h_25, h_50, h_75, h_100
 end
 
-  open("h_25_TESTE.dat","w") do io
+  open("h_25.dat","w") do io
     writedlm(io,cluster_q(helix)[1])
   end
 
