@@ -27,16 +27,16 @@ default(
 plot(layout=@layout [ [ a [ b ; c ] ] a{0.1w} ; d ] )
 #plot(layout=@layout [ [ a b ]  a{0.1w} ] )
 
-label = [ #"A",
-          #"BI",
-          #"BII", "CI",
-          #"CII", "DI",
-          "DII", 
-          #"DIII",
-          #"E", 
-          "F",
-          #"G", 
-          "H" ]
+label = [ #"U1",
+          #"U2.1",
+          #"U2.2", "U3.1",
+          #"U3.2", "U4.1",
+          "U4.2", 
+          #"U4.3",
+          #"U5", 
+          "U6",
+          #"U7", 
+          "N8" ]
 
   c = [ #get(ColorSchemes.okabe_ito,(1)/12),
       #get(ColorSchemes.okabe_ito,(2)/12),
@@ -81,7 +81,7 @@ sp=3
     # Water
     cm_water = ComplexMixtures.load("./results-water_$(label[i]).json")
     plot!(cm_water.d,ma(cm_water.kb./1000),
-    xlabel=L"\mathrm{r/Å}",ylabel=L"{G_{pw}} \ (r) / \mathrm{L\ mol^{-1}}",
+    xlabel=L"\mathrm{r/Å}",ylabel=L"{U7_{pw}} \ (r) / \mathrm{L\ mol^{-1}}",
     subplot=sp,
     xlim=[0.5,6.0],
     color=c[i],
@@ -120,7 +120,7 @@ sp=4
 pdb = readPDB("./solvated.pdb")
 
 # Load results of a ComplexMixtures run
-R = load("./results-water_F.json")
+R = load("./results-water_U6.json")
 
 # Inform which is the solute
 protein = select(pdb, "protein")
@@ -150,7 +150,7 @@ sequence = getseq(protein)
 rescontrib_U1 = copy(rescontrib)
 
 # Load results of a ComplexMixtures run
-R = load("./results-water_H.json")
+R = load("./results-water_N8.json")
 
 rescontrib = zeros(length(R.mddf), length(residues))
 for (ires, residue) in pairs(residues)
