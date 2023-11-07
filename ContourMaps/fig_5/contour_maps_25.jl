@@ -1,6 +1,6 @@
 using PlotlyJS, DelimitedFiles
 
-file1 = readdlm("./../../ElViM/projection.out")
+file1 = readdlm("./../../ELViM/projection.out")
 
 proj_25 = readdlm("./proj_25.dat")
 

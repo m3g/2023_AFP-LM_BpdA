@@ -2,7 +2,7 @@ using DelimitedFiles
 
 work = @__DIR__
 
-    file1 = readdlm("./../../ElViM/projection.out")
+    file1 = readdlm("./../../ELViM/projection.out")
      h_25 = readdlm("./h_25.dat",Int64)
      h_50 = readdlm("./h_50.dat",Int64)
      h_75 = readdlm("./h_75.dat",Int64)
