@@ -1,65 +1,80 @@
-using Plots, Statistics, DelimitedFiles
+#
+# Script originally developed with Julia 1.9.3
+#
+# For exact reproducibility:
+# Install Julia with juliaup: https://github.com/JuliaLang/juliaup#readme
+# Install the 1.9.3 version of Julia with: juliaup add 1.9.3
+# Run with: julia +1.9.3 -t auto ./helix_content.jl
+#
+import Pkg
+Pkg.activate(".")
+Pkg.instantiate() # install all packages if not already
 
-dir = @__DIR__
-nresidues = 60
+using Base.Threads
+using ZipFile
+using ProteinSecondaryStructures
+using PDBTools
+using DelimitedFiles
+using Statistics
+using ProgressMeter
+using EasyFit
+using Plots
 
-function get_helicity(dir,nresidues)
-  files = filter(f -> f[end-4:end] == ".dssp", readdir(dir))   # Why [end-4:end] ?
-  nfiles = length(files)  
-  matrix = zeros(Float64,nfiles,nresidues)                            # nfiles = number of lines; nresidues = number of colums
-  for i in 0:nfiles-1
-    file = open("$dir/$(i)0.pdb.dssp","r")
-    residue_start = false
-    for line in eachline(file)
-      # skip header
-      if occursin("RESIDUE",line)
-        residue_start = true
-        continue
-      end
-      if ! residue_start 
-        continue
-      end
-      # read data: columns 6:10 contain the residue number,
-      # it data for the residue is available
-      try
-        residue = parse(Int,line[6:10])
-        # If 17th character is an 'H', an helix was attributed
-        # to this residue
-        if line[17] == 'H'
-          matrix[i+1,residue] = 1
+function get_helicity(; dir="./equilibrated_all_atom_models", nfiles=5000)
+    nresidues = 60
+    # nfiles = number of lines; nresidues = number of colums
+    hmatrix = zeros(Int, nfiles, nresidues)
+    p = Progress(nfiles)
+    @threads for ifile in 1:nfiles
+        file = "$dir/$(ifile-1).pdb.zip" 
+        file_read = try
+            read(ZipFile.Reader(file).files[1], String)
+        catch
+            nothing
         end
-      catch
-        continue
-      end
+        if isnothing(file_read)
+            println("\n error in file: $file")
+            continue
+        end
+        atoms = readPDB(IOBuffer(file_read))
+        hmatrix[ifile, :] .= is_alphahelix.(dssp_run(atoms))
+        next!(p)
     end
-    close(file)
-  end
-  avg_helicity_per_frame = [ mean(matrix[i,:]) for i in 1:nfiles ]
-  helix_i   = [ mean(matrix[i,10:19]) for i in 1:nfiles ]
-  helix_ii  = [ mean(matrix[i,25:37]) for i in 1:nfiles ]
-  helix_iii = [ mean(matrix[i,42:56]) for i in 1:nfiles ]
-  helix_tot = [ (helix_i[i].+helix_ii[i].+helix_iii[i])/3 for i in 1:length(helix_i) ]
-  return avg_helicity_per_frame, matrix, helix_i, helix_ii, helix_iii, helix_tot
+    finish!(p)
+    helix_i = mean(hmatrix[:, 10:19], dims=2)
+    helix_ii = mean(hmatrix[:, 25:37], dims=2)
+    helix_iii = mean(hmatrix[:, 42:56], dims=2)
+    helix_tot = (helix_i + helix_ii + helix_iii) / 3
+    writedlm("hmatrix.txt", hmatrix)
+    writedlm("helix_tot.txt", hcat(helix_tot))
+    writedlm("helix_i.txt", hcat(helix_i))
+    writedlm("helix_ii.txt", hcat(helix_ii))
+    writedlm("helix_iii.txt", hcat(helix_iii))
+    return helix_tot, hmatrix, helix_i, helix_ii, helix_iii
 end
 
-helix_tot, matrix, helix_i, helix_ii, helix_iii = get_helicity(dir,nresidues)
+function plot_helicity()
+    helix_tot = vec(readdlm("helix_tot.txt"))
+    helix_i = vec(readdlm("helix_i.txt"))
+    helix_ii = vec(readdlm("helix_ii.txt"))
+    helix_iii = vec(readdlm("helix_iii.txt"))
+    plt = plot(layout=(3, 2), size=(800, 600))
+    d = fitdensity(vec(helix_i))
+    plot!(plt, helix_i, xlabel="frame", ylabel="α-helical content", label="helix_i", subplot=1)
+    plot!(plt, d.d, ylabel="density", xlabel="α-helical content", label="helix_i", subplot=2)
+    d = fitdensity(vec(helix_ii))
+    plot!(plt, helix_i, xlabel="frame", ylabel="α-helical content", label="helix_ii", subplot=3)
+    plot!(plt, d.d, ylabel="density", xlabel="α-helical content", label="helix_ii", subplot=4)
+    d = fitdensity(vec(helix_iii))
+    plot!(plt, helix_i, xlabel="frame", ylabel="α-helical content", label="helix_iii", subplot=5)
+    plot!(plt, d.d, ylabel="density", xlabel="α-helical content", label="helix_iii", subplot=6)
+    savefig(plt, "helicity.png")
+    return plt
+end
 
-  open("helix_tot.txt", "w") do io
-    writedlm(io,helix_tot)
-  end
+function main()
+    get_helicity()
+    plot_helicity()
+end
 
-  open("matrix.txt", "w") do io
-    writedlm(io,matrix)
-  end
-
-  open("helix_i.txt", "w") do io
-    writedlm(io,helix_i)
-  end
-
-  open("helix_ii.txt", "w") do io
-    writedlm(io,helix_ii)
-  end
-
-  open("helix_iii.txt", "w") do io
-    writedlm(io,helix_iii)
-  end
+!isinteractive() && main()
