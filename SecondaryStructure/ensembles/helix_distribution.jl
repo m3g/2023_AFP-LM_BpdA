@@ -58,7 +58,7 @@ using LaTeXStrings
         margin=0.3Plots.Measures.cm,
         leftmargin=0.5Plots.Measures.cm,
         xlabel="α-helical content",
-        ylabel="density"
+        ylabel="number of structures"
     )
     save && savefig("helix_distribution.pdf")
     return plt
