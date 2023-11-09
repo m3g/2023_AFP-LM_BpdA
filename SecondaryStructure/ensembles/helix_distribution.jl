@@ -44,7 +44,7 @@ using LaTeXStrings
         helix_avg = (helix_i + helix_ii + helix_iii) / 3
         avg = mean(helix_avg)
         standard_deviation = std(helix_avg)
-        println("$(file[3:end-4]) : Mean helicity: $(round(avg, digits=2)) ± $(round(standard_deviation, digits=2))")
+        println("$(file[3:end-4]) : N = $(length(structures)) - Mean helicity: $(round(avg, digits=2)) ± $(round(standard_deviation, digits=2))")
         histogram!(plt, helix_avg, subplot=ifile,
             legend=nothing,
             title="$(labels[ifile]) : $(round(avg, digits=2)) ± $(round(standard_deviation, digits=2))",
