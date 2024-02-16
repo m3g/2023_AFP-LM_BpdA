@@ -1,0 +1,3 @@
+
+The folding funnel of the B domain of protein A: the depth of the funnel is the fraction of native contacts, and the colors of the structures, from red to blue, indicate the ammount of helical content. Structures with significant ammount of helical structures permeate the complete ensemble.
+
